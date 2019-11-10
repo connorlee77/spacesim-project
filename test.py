@@ -20,9 +20,8 @@ for file in files:
 	data.append(f)
 data = np.vstack(data)
 
-xdata = np.zeros((len(data), 17))
-xdata[:,:9] = data[:,:9]
-xdata[:,9:] = data[:,12:]
+xdata = np.zeros((len(data), 3))
+xdata = data[:,3:6]
 
 ydata = data[:,9:12]
 x_train, x_test, y_train, y_test = xdata[:7000,:], xdata[7000:,:], ydata[:7000,:], ydata[7000:,:]
@@ -30,7 +29,7 @@ print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
 
 # N is batch size; D_in is input dimension;
 # H is hidden dimension; D_out is output dimension.
-batch_size, D_in, H, D_out = 64, 17, 5, 3
+batch_size, D_in, H, D_out = 64, len(xdata[0]), 5, 3
 
 # Create random Tensors to hold inputs and outputs
 tensor_data = torch.from_numpy(x_train).float()
