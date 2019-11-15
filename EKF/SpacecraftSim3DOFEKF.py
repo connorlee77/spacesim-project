@@ -48,7 +48,7 @@ def state_prop(x,u,dt,param):
 
     # Propagation Example Discrete Dynamics
 
-    xp_dummy = dyn.SS3dofDyn(x,u,param)
+    xp_dummy = dyn.SS3dofDyn(x,u,param, predict_fricfunc=True)
     xp = dyn.EulerInt(xp_dummy,dt,x) 
     # + Sigma*np.random.randn(6,1)
 

@@ -67,7 +67,7 @@ def main():
 
     for i in range(0,n-1):
         # dynamics 
-        dx = dyn.SS3dofDyn(x_dyn[:,i],u,param)
+        dx = dyn.SS3dofDyn(x_dyn[:,i],u,param, predict_fricfunc=False)
         x_dyn[:,i+1] = dyn.EulerInt(dx,dt,x_dyn[:,i])
         # Sensor Data Simulator 
         yg = sensor.GPS(x_dyn[:,i+1])
@@ -83,8 +83,8 @@ def main():
         x_ekf[:,i+1] = ekf.state_update(xu_ekf,y,H,K)
         P = ekf.covar_update(Pu,H,K)
 
-    plt.plot(t, x_dyn[5, :], 'b', label='x_dyn(t)')
-    plt.plot(t, x_ekf[5, :], 'g', label='x_ekf(t)')
+    plt.plot(t, x_dyn[4, :], 'b', label='x_dyn(t)')
+    plt.plot(t, x_ekf[4, :], 'g', label='x_ekf(t)')
     plt.legend(loc='best')
     plt.xlabel('t')
     plt.grid()

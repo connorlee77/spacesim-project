@@ -4,6 +4,9 @@ import numpy as np
 import scipy as sp
 import math as mt
 import matplotlib.pyplot as plt
+import torch
+
+from inference import getModel
 
 """
 For open loop simulation of the 
@@ -14,7 +17,13 @@ Given : Control Input, Intial Condition and Model Parameters
 Euler Method for Time Integration
 """
 
-def SS3dofDyn(x,u,param):
+model = getModel()
+dt = 0.1
+
+a = 0
+b = 0
+c = 0
+def SS3dofDyn(x,u,param, predict_fricfunc=False):
     m = param[0]
     I = param[1]
     l = param[2]
@@ -39,7 +48,26 @@ def SS3dofDyn(x,u,param):
     
     # Dynamics 
 
+    ####                          ###  
+    ### Add learned dynamics here ###
+    ####                          ###
+    with torch.no_grad():
+        xdot = torch.from_numpy(state[3:]).float()
+        predicted = model(xdot*dt).numpy().reshape((3,1))
+        modeledfunction = np.zeros((6,1))
+        modeledfunction[3:] = predicted
+   
     dxdt = np.mat(A)*np.mat(np.reshape(state,(6,1))) + np.concatenate((np.array([[0],[0],[0]]),F),axis=0)
+    
+    if predict_fricfunc:
+        dxdt += modeledfunction/dt
+    else:
+        known_fricfunc = np.copy(state[3:])
+        known_fricfunc[0] *= 0.1 
+        known_fricfunc[1] *= 0.1
+        known_fricfunc[2] *= 0.1
+        dxdt += np.array([[0],[0],[0], *known_fricfunc.reshape((3,1))])
+
     return np.reshape(np.array(dxdt),(6))
 
 
