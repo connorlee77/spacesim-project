@@ -33,7 +33,8 @@ def main():
     
     # Sensor Matrix
 
-    H = np.array([[1,0,0,0,0,0],[0,1,0,0,0,0],[0,0,1,0,0,0],[0,0,0,0,0,1]])
+    H = np.array([[1,0,0,0,0,0],[0,1,0,0,0,0],[0,0,1,0,0,0],[0,0,0,1,0,0],[0,0,0,0,1,0],[0,0,0,0,0,1]])
+
 
 
     #Intial Conditions for EKF
@@ -48,9 +49,18 @@ def main():
 
     # Process Covariance 
 
-    Q = np.identity(6)*0.05
+    Q = np.identity(6)*1
 
-    R = np.identity(4)*0.05
+    sig = np.zeros((6,6))
+
+    sig[0,0] = 0.1
+    sig[1,1] = 0.1
+    sig[2,2] = 0.01
+    sig[3,3] = 0.1
+    sig[4,4] = 0.1
+    sig[5,5] = 0.1
+    
+    R = sig
 
     t = np.linspace(0, 20, 200)
 
