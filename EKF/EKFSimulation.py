@@ -17,27 +17,18 @@ Simulation Using the Library
 """
 def main():
 
-    for predictOrNone in ['predict', ' no predict']:
+    error = []
+    for predictOrNone in ['predict', 'no predict']:
         param = np.array([1,1,1,1])
         # Initial Conditions for Dynamics
         xinit_dyn = np.array([[1],[0],[0],[0],[0],[0]])
         x0_dyn = np.reshape(xinit_dyn,(6))
         # control input
         u = np.array([[1],[0],[0],[0],[0],[0],[0],[0]])
-
-        Sigma = np.zeros((6,6))
-        Sigma[0,0] = 0.005
-        Sigma[1,1] = 0.005
-        Sigma[2,2] = 0.005
-        Sigma[3,3] = 0.005
-        Sigma[4,4] = 0.005
-        Sigma[5,5] = 0.005
         
         # Sensor Matrix
 
         H = np.array([[1,0,0,0,0,0],[0,1,0,0,0,0],[0,0,1,0,0,0],[0,0,0,1,0,0],[0,0,0,0,1,0],[0,0,0,0,0,1]])
-
-
 
         #Intial Conditions for EKF
 
@@ -46,11 +37,9 @@ def main():
         x0_ekf = np.reshape(xinit_ekf,(6))
         
         # Covariance 
-
         P = np.identity(6)*100000000
 
         # Process Covariance 
-
         Q = np.identity(6)*1
 
         sig = np.zeros((6,6))
@@ -64,18 +53,15 @@ def main():
         
         R = sig
 
-        t = np.linspace(0, 20, 200)
+        t = np.linspace(0, 10, 100)
 
         dt = t[1]-t[0]
-        print(dt)
         n = len(t)
         x_dyn = np.zeros([6,n])
         x_dyn[:,0] = x0_dyn
 
         x_ekf = np.zeros([6,n])
         x_ekf[:,0] = x0_ekf
-
-
 
         for i in range(0,n-1):
 
@@ -97,14 +83,19 @@ def main():
             P = ekf.covar_update(Pu,H,K)
 
         
-        plt.plot(t, x_ekf[4, :], label='x_ekf(t)' + predictOrNone)
+        plt.plot(t, x_ekf[5, :], '--', label='x_ekf(t)' + predictOrNone)
         
-    plt.plot(t, x_dyn[4, :], 'b', label='x_dyn(t)')
+        xerror = np.linalg.norm(x_ekf[0:2, :] - x_dyn[0:2,:], axis=0)
+        xdoterror = np.linalg.norm(x_ekf[3:5, :] - x_dyn[3:5,:], axis=0)
+        print(np.mean(xerror))
+        print(np.mean(xdoterror))     
+
+    plt.plot(t, x_dyn[5, :], 'b', label='x_dyn(t)')
        
     plt.legend(loc='best')
     plt.xlabel('t')
     plt.grid()  
-    plt.show()
+    plt.savefig('ekfcomp.png')
 
 if __name__ == "__main__":
     main()
