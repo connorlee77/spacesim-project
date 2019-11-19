@@ -29,7 +29,7 @@ print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
 
 # N is batch size; D_in is input dimension;
 # H is hidden dimension; D_out is output dimension.
-batch_size, D_in, H, D_out = 64, len(xdata[0]), 5, 3
+batch_size, D_in, H, D_out = 64, len(xdata[0]), 20, 3
 
 # Create random Tensors to hold inputs and outputs
 tensor_data = torch.from_numpy(x_train).float()
@@ -50,6 +50,8 @@ test_loader = data_utils.DataLoader(test_dataset, batch_size=1, shuffle=False)
 # linear function, and holds internal Tensors for its weight and bias.
 model = torch.nn.Sequential(
 	torch.nn.Linear(D_in, H),
+	torch.nn.ReLU(),
+	torch.nn.Linear(H, H),
 	torch.nn.ReLU(),
 	torch.nn.Linear(H, D_out),
 )
@@ -101,7 +103,7 @@ for t in range(epochs):
 		train_losses.append(train_loss / len(train_loader))
 		test_losses.append(test_loss / len(test_loader))
 
-torch.save(model.state_dict(), 'weights.pt')
+torch.save(model.state_dict(), 'weights20.pt')
 
 plt.plot(range(1,epochs), train_losses[1:])
 plt.plot(range(1,epochs), test_losses[1:])
