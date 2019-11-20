@@ -120,6 +120,7 @@ def main():
         
     plt.plot(x_dyn[4, 2:])
     plt.plot(xs[4, 2:])
+    plt.show()
 
 
 if __name__ == "__main__":

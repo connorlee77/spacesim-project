@@ -27,7 +27,7 @@ x_train, x_test, y_train, y_test = xdata[:7000,:], xdata[7000:,:], ydata[:7000,:
 
 # N is batch size; D_in is input dimension;
 # H is hidden dimension; D_out is output dimension.
-batch_size, D_in, H, D_out = 64, len(xdata[0]), 20, 3
+batch_size, D_in, H, D_out = 64, len(xdata[0]), 5, 3
 
 def getModel():
 	model = torch.nn.Sequential(
@@ -38,7 +38,7 @@ def getModel():
 		torch.nn.Linear(H, D_out),
 	)
 
-	model.load_state_dict(torch.load('../weights20.pt'))
+	model.load_state_dict(torch.load('../weightsrand.pt'))
 	model.eval()
 
 	return model

@@ -31,6 +31,7 @@ for k=1:length(files)
         F(str2num(num(j))) = 1;
     end
     
+    phi = zeros(length(data), 3)
     for i=2:length(data)
         
         theta_t1 = data(i-1,3);
@@ -44,7 +45,13 @@ for k=1:length(files)
         
         % discretized dynamics
         phi_mat = (v_t2 - (eye(6) + A1*dt)*v_t1 - dt*A3*u*F)/dt;
+        phi(i,:) = phi_mat(4:6);
+        
+        ans = v_t2;
+        ans(4:6)'*0.1
+        phi(i,:)
+        
     end
-    data = horzcat(data, phi_mat);
-    csvwrite(join(['csv/', files(k).name(1:end-3), 'csv']), data);
+    data = horzcat(data, phi);
+    %csvwrite(join(['csv/', files(k).name(1:end-3), 'csv']), data);
 end

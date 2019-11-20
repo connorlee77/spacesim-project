@@ -63,8 +63,8 @@ def SS3dofDyn(x,u,param, fric_func=False, dt=1):
     known_fricfunc[1] *= 0.1
     known_fricfunc[2] *= 0.1
 
-    # print("actual: ", known_fricfunc)
-    # print("predicted: ", predicted.reshape((1,3))/dt)
+    print("actual: ", known_fricfunc)
+    print("predicted: ", predicted.reshape((1,3))/dt)
 
     if fric_func=='predict':
         dxdt += modeledfunction
