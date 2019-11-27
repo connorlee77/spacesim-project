@@ -34,7 +34,7 @@ def SensorMatrix(x):
 
 # Propagation Step
 
-def state_prop(x,u,dt,param):
+def state_prop(x,dt,u,param):
     # Process Noise 
     """
     Sigma = np.zeros((6,6))
@@ -48,7 +48,7 @@ def state_prop(x,u,dt,param):
 
     # Propagation Example Discrete Dynamics
 
-    xp_dummy = dyn.SS3dofDyn(x,u,param, predict_fricfunc=True)
+    xp_dummy = dyn.SS3dofDyn(x,u,param, predict_fricfunc=False)
     xp = dyn.EulerInt(xp_dummy,dt,x) 
     # + Sigma*np.random.randn(6,1)
 

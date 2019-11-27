@@ -23,7 +23,7 @@ dt = 0.1
 a = 0
 b = 0
 c = 0
-def SS3dofDyn(x,u,param, predict_fricfunc=False):
+def SS3dofDyn(x,u,param, predict_fricfunc):
     m = param[0]
     I = param[1]
     l = param[2]

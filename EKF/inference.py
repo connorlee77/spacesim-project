@@ -29,16 +29,31 @@ x_train, x_test, y_train, y_test = xdata[:7000,:], xdata[7000:,:], ydata[:7000,:
 # H is hidden dimension; D_out is output dimension.
 batch_size, D_in, H, D_out = 64, len(xdata[0]), 5, 3
 
+# Create random Tensors to hold inputs and outputs
+tensor_data = torch.from_numpy(x_train).float()
+tensor_target = torch.from_numpy(y_train).float()
+
+tensor_data_val = torch.from_numpy(x_test).float()
+tensor_target_val = torch.from_numpy(y_test).float()
+
+train_dataset = data_utils.TensorDataset(tensor_data, tensor_target)
+train_loader = data_utils.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+
+test_dataset = data_utils.TensorDataset(tensor_data_val, tensor_target_val)
+test_loader = data_utils.DataLoader(test_dataset, batch_size=1, shuffle=False)
+
+# Use the nn package to define our model as a sequence of layers. nn.Sequential
+# is a Module which contains other Modules, and applies them in sequence to
+# produce its output. Each Linear Module computes output from input using a
+# linear function, and holds internal Tensors for its weight and bias.
+
 def getModel():
 	model = torch.nn.Sequential(
 		torch.nn.Linear(D_in, H),
 		torch.nn.ReLU(),
-		torch.nn.Linear(H, H),
-		torch.nn.ReLU(),
 		torch.nn.Linear(H, D_out),
 	)
-
-	model.load_state_dict(torch.load('../weightsrand.pt'))
+	model.load_state_dict(torch.load('../weights.pt'))
 	model.eval()
 
 	return model

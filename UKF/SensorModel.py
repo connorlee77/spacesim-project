@@ -50,23 +50,26 @@ def IMU_3DOF(x0,x1,T):
     state_t1 = np.reshape(x1,(6))
     state_t0 = np.reshape(x0,(6))
     sigma_theta = 0.001
-    sigma_x = 0.01
-    sigma_y = 0.01
+    sigma_x = 0.001
+    sigma_y = 0.001
     dtheta = state_t1[5]  + sigma_theta*np.random.randn(1,1)
     accel_x = (state_t1[3] - state_t0[3])/T + sigma_x*np.random.randn(1,1)
     accel_y =  (state_t1[4] - state_t0[4])/T  + sigma_y*np.random.randn(1,1)
 
-    theta = np.arctan2(accel_y,accel_x)
+    vel_x = state_t1[3] + sigma_x*np.random.randn(1,1)
+    vel_y = state_t1[4] + sigma_y*np.random.randn(1,1)
 
-    return np.reshape(np.array([[theta],[dtheta]]),(2,1))
+    theta = np.arctan2(accel_y,accel_x) + sigma_theta*np.random.randn(1,1)
+
+    return np.reshape(np.array([[theta],[vel_x],[vel_y],[dtheta]]),(4,1))
 
     
 def GPS(state):
     """
     Gives absolute position with respect to an Inertial Frame 
     """
-    sigma_x = 0.01 
-    sigma_y = 0.01
+    sigma_x = 0.001 
+    sigma_y = 0.001
 
     x = state[0] + sigma_x*np.random.randn(1,1)
     y = state[1] + sigma_y*np.random.randn(1,1)

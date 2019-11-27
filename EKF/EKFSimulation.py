@@ -10,43 +10,52 @@ import SensorModel as sensor
 import SpacecraftSim3DOF as dyn
 import SpacecraftSim3DOFEKF as ekf
 
-np.random.seed(0)
-def EKF(predictOrNone, t):
+"""
+Simulation Using the Library 
+
+"""
+def main():
+
     param = np.array([1,1,1,1])
     # Initial Conditions for Dynamics
     xinit_dyn = np.array([[1],[0],[0],[0],[0],[0]])
     x0_dyn = np.reshape(xinit_dyn,(6))
     # control input
-    u = np.array([[1],[0],[1],[0],[0],[0],[0],[0]])
+    u = np.array([[1],[0],[0],[0],[0],[0],[0],[0]])
+
+    Sigma = np.zeros((6,6))
+    Sigma[0,0] = 0.005
+    Sigma[1,1] = 0.005
+    Sigma[2,2] = 0.005
+    Sigma[3,3] = 0.005
+    Sigma[4,4] = 0.005
+    Sigma[5,5] = 0.005
     
     # Sensor Matrix
 
-    H = np.array([[1,0,0,0,0,0],[0,1,0,0,0,0],[0,0,1,0,0,0],[0,0,0,1,0,0],[0,0,0,0,1,0],[0,0,0,0,0,1]])
+    H = np.array([[1,0,0,0,0,0],[0,1,0,0,0,0],[0,0,1,0,0,0],[0,0,0,0,0,1]])
+
 
     #Intial Conditions for EKF
 
     # state
-    xinit_ekf = np.array([[-3],[-3],[-1.3],[0],[0],[0]])
+    xinit_ekf = np.array([[-3],[-3],[0.3],[0],[0],[0]])
     x0_ekf = np.reshape(xinit_ekf,(6))
     
     # Covariance 
+
     P = np.identity(6)*100000000
 
     # Process Covariance 
-    Q = np.identity(6)*1
 
-    sig = np.zeros((6,6))
+    Q = np.identity(6)*0.05
 
-    sig[0,0] = 0.1
-    sig[1,1] = 0.1
-    sig[2,2] = 0.01
-    sig[3,3] = 0.1
-    sig[4,4] = 0.1
-    sig[5,5] = 0.1
-    
-    R = sig
+    R = np.identity(4)*0.05
+
+    t = np.linspace(0, 20, 200)
 
     dt = t[1]-t[0]
+
     n = len(t)
     x_dyn = np.zeros([6,n])
     x_dyn[:,0] = x0_dyn
@@ -54,10 +63,11 @@ def EKF(predictOrNone, t):
     x_ekf = np.zeros([6,n])
     x_ekf[:,0] = x0_ekf
 
-    for i in range(0,n-1):
 
+
+    for i in range(0,n-1):
         # dynamics 
-        dx = dyn.SS3dofDyn(x_dyn[:,i],u,param, fric_func='true', dt=dt)
+        dx = dyn.SS3dofDyn(x_dyn[:,i],u,param, predict_fricfunc=False)
         x_dyn[:,i+1] = dyn.EulerInt(dx,dt,x_dyn[:,i])
         # Sensor Data Simulator 
         yg = sensor.GPS(x_dyn[:,i+1])
@@ -66,65 +76,20 @@ def EKF(predictOrNone, t):
         y = np.concatenate((yg,ya),axis=0)
         # EKF loop to estimate above dynamics
         #   # Propagation Step
-        xu_ekf = ekf.state_prop(x_ekf[:,i],u,dt,param, fric_func=predictOrNone)
+        xu_ekf = ekf.state_prop(x_ekf[:,i],u,dt,param)
         Pu = ekf.covar_prop(P,Q,x_ekf[:,i],u,dt,param)
         #   # Update Step
         K = ekf.Kalmangain(Pu,H,R)
         x_ekf[:,i+1] = ekf.state_update(xu_ekf,y,H,K)
         P = ekf.covar_update(Pu,H,K)
 
-    
-    
+    plt.plot(t, x_dyn[4, :], 'b', label='x_dyn(t)')
+    plt.plot(t, x_ekf[4, :], 'g', label='x_ekf(t)')
+    plt.legend(loc='best')
+    plt.xlabel('t')
+    plt.grid()
+    plt.show()     
 
-    xerror = np.linalg.norm(x_ekf[0:2, :] - x_dyn[0:2,:], axis=0)
-    xdoterror = np.linalg.norm(x_ekf[3:5, :] - x_dyn[3:5,:], axis=0)
-    print(np.mean(xerror))
-    print(np.mean(xdoterror))  
-
-    return x_dyn, x_ekf
-
-"""
-Simulation Using the Library 
-
-"""
-def main():
-
-    t = np.linspace(0, 10, 100)
-    x_dyn, x_ekf = EKF('none', t)
-    x_dyn_prd, x_ekf_prd = EKF('predict', t)
-
-    ylabel = [r'$x$', r'$y$', r'$sin(\theta)$', r'$\dot{x}$', r'$\dot{y}$', r'$\dot{\theta}$']
-    for i in range(0,6):
-        
-        if i==2:
-            plt.plot(t, np.sin(x_dyn[i, :]), 'b', label='Simulated Data')
-            plt.plot(t, np.sin(x_ekf[i, :]), 'g', label='EKF Estimate')
-        else:
-            plt.plot(t, x_dyn[i, :], 'b', label='Simulated Data')
-            plt.plot(t, x_ekf[i, :], 'g', label='EKF Estimate')
-        plt.legend(loc='upper right')
-        plt.xlabel('t')
-        plt.ylabel(ylabel[i])
-        plt.grid()  
-        plt.savefig('figures/' + str(i) + '.png')
-        plt.close()
-
-    for i in range(0,6):
-        
-        if i==2:
-            plt.plot(t, np.sin(x_dyn[i, :]), 'b', label='Simulated Data')
-            plt.plot(t, np.sin(x_ekf[i, :]), 'g', label='EKF Estimate')
-            plt.plot(t, np.sin(x_ekf_prd[i, :]), 'r', label='EKF Estimate w/ lrn. func')
-        else:
-            plt.plot(t, x_dyn[i, :], 'b', label='Simulated Data')
-            plt.plot(t, x_ekf[i, :], 'g', label='EKF Estimate')
-            plt.plot(t, x_ekf_prd[i, :], 'r', label='EKF Estimate w/ lrn. func')
-        plt.legend(loc='upper right')
-        plt.xlabel('t')
-        plt.ylabel(ylabel[i])
-        plt.grid()  
-        plt.savefig('figures/' + str(i) + 'prd.png')
-        plt.close()
 
 if __name__ == "__main__":
     main()
