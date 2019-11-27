@@ -18,12 +18,11 @@ Euler Method for Time Integration
 """
 
 model = getModel()
-dt = 0.1
 
 a = 0
 b = 0
 c = 0
-def SS3dofDyn(x,u,param, predict_fricfunc=False):
+def SS3dofDyn(x,u,param, fric_func=False, dt=1):
     m = param[0]
     I = param[1]
     l = param[2]
@@ -55,19 +54,23 @@ def SS3dofDyn(x,u,param, predict_fricfunc=False):
         xdot = torch.from_numpy(state[3:]).float()
         predicted = model(xdot*dt).numpy().reshape((3,1))
         modeledfunction = np.zeros((6,1))
-        modeledfunction[3:] = predicted
+        modeledfunction[3:] = predicted/dt
    
     dxdt = np.mat(A)*np.mat(np.reshape(state,(6,1))) + np.concatenate((np.array([[0],[0],[0]]),F),axis=0)
     
-    if predict_fricfunc:
-        dxdt += modeledfunction/dt
-    else:
-        known_fricfunc = np.copy(state[3:])
-        known_fricfunc[0] *= 0.1 
-        known_fricfunc[1] *= 0.1
-        known_fricfunc[2] *= 0.1
-        dxdt += np.array([[0],[0],[0], *known_fricfunc.reshape((3,1))])
+    known_fricfunc = np.copy(state[3:])
+    known_fricfunc[0] *= 0.1
+    known_fricfunc[1] *= 0.1
+    known_fricfunc[2] *= 0.1
 
+    print("actual: ", known_fricfunc)
+    print("predicted: ", predicted.reshape((1,3))/dt)
+
+    if fric_func=='predict':
+        dxdt += modeledfunction
+    elif fric_func=='true':
+        dxdt += np.array([[0],[0],[0], *known_fricfunc.reshape((3,1))])
+    
     return np.reshape(np.array(dxdt),(6))
 
 

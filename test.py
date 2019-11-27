@@ -51,9 +51,11 @@ test_loader = data_utils.DataLoader(test_dataset, batch_size=1, shuffle=False)
 model = torch.nn.Sequential(
 	torch.nn.Linear(D_in, H),
 	torch.nn.ReLU(),
+	torch.nn.Linear(H, H),
+	torch.nn.ReLU(),
 	torch.nn.Linear(H, D_out),
 )
-model.load_state_dict(torch.load('weights.pt'))
+model.load_state_dict(torch.load('weightsrand.pt'))
 model.eval()
 
 # The nn package also contains definitions of popular loss functions; in this
@@ -64,5 +66,10 @@ with torch.no_grad():
 	test_loss = 0
 	for x, y in test_loader:
 		y_pred = model(x)
-		test_loss += loss_fn(y_pred, y).item()
+
+		print("Predicted: ", y_pred)
+		print("Actual: ", x*0.1)
+		print()
+
+		test_loss += loss_fn(y_pred, x*0.1).item()
 	print(test_loss/ len(test_loader))
