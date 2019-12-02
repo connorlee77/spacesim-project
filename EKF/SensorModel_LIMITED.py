@@ -64,7 +64,7 @@ def IMU_3DOF(x0,x1,T):
 
     theta = np.arctan2(accel_y,accel_x) + sigma_theta*np.random.randn(1,1)
 
-    return np.reshape(np.array([[theta],[vel_x],[vel_y],[dtheta]]),(4,1))
+    return np.reshape(np.array([dtheta]),(1,1))
 
     
 def GPS(state):

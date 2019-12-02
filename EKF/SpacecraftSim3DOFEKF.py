@@ -34,7 +34,7 @@ def SensorMatrix(x):
 
 # Propagation Step
 
-def state_prop(x,u,dt,param, fric_func=None):
+def state_prop(x,u,dt,param, fric_func):
     # Process Noise 
     """
     Sigma = np.zeros((6,6))

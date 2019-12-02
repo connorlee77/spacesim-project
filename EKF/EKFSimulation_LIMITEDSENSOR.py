@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Dec  2 13:26:57 2019
+
+@author: jspratt
+"""
+
+#!/usr/bin/env python3
 
 import numpy as np
 import scipy as sp
@@ -6,7 +14,7 @@ import math as mt
 import sympy as sp
 
 import matplotlib.pyplot as plt
-import SensorModel as sensor
+import SensorModel_LIMITED as sensor
 import SpacecraftSim3DOF as dyn
 import SpacecraftSim3DOFEKF as ekf
 
@@ -21,7 +29,8 @@ def EKF(predictOrNone, t):
     
     # Sensor Matrix
 
-    H = np.array([[1,0,0,0,0,0],[0,1,0,0,0,0],[0,0,1,0,0,0],[0,0,0,1,0,0],[0,0,0,0,1,0],[0,0,0,0,0,1]])
+    #H = np.array([[1,0,0,0,0,0],[0,1,0,0,0,0],[0,0,1,0,0,0],[0,0,0,1,0,0],[0,0,0,0,1,0],[0,0,0,0,0,1]])
+    H = np.array([[1,0,0,0,0,0],[0,1,0,0,0,0],[0,0,0,0,0,1]])
 
     #Intial Conditions for EKF
 
@@ -36,14 +45,14 @@ def EKF(predictOrNone, t):
     # Process Covariance 
     Q = np.identity(6)*0.1
 
-    sig = np.zeros((6,6))
+    sig = np.zeros((3,3))
 
     sig[0,0] = 0.1
     sig[1,1] = 0.1
     sig[2,2] = 0.01
-    sig[3,3] = 0.1
-    sig[4,4] = 0.1
-    sig[5,5] = 0.1
+    #sig[3,3] = 0.1
+    #sig[4,4] = 0.1
+    #sig[5,5] = 0.1
     
     R = sig
 
@@ -54,8 +63,8 @@ def EKF(predictOrNone, t):
 
     x_ekf = np.zeros([6,n])
     x_ekf[:,0] = x0_ekf
-    
-    y_plot = np.zeros((6,100))
+
+    y_plot = np.zeros((3,100))
 
     for i in range(0,n-1):
 
@@ -75,8 +84,7 @@ def EKF(predictOrNone, t):
         K = ekf.Kalmangain(Pu,H,R)
         x_ekf[:,i+1] = ekf.state_update(xu_ekf,y,H,K)
         P = ekf.covar_update(Pu,H,K)
-        y_plot[:,i+1] = y.reshape((6))
-
+        y_plot[:,i+1] = y.reshape((3))
     
     
 
@@ -101,11 +109,21 @@ def main():
     for i in range(0,6):
         
         if i==2:
-            plt.plot(t, np.sin(y_plot[i, :]),'rx',label='measurements')
             plt.plot(t, np.sin(x_dyn[i, :]), 'b', label='Simulated Data')
             plt.plot(t, np.sin(x_ekf[i, :]), 'g', label='EKF Estimate')
-        else:
+        elif i == 0:
             plt.plot(t, y_plot[i, :],'rx',label='measurements')
+            plt.plot(t, x_dyn[i, :], 'b', label='Simulated Data')
+            plt.plot(t, x_ekf[i, :], 'g', label='EKF Estimate')
+        elif i == 1:
+            plt.plot(t, y_plot[i, :],'rx',label='measurements')
+            plt.plot(t, x_dyn[i, :], 'b', label='Simulated Data')
+            plt.plot(t, x_ekf[i, :], 'g', label='EKF Estimate')
+        elif i == 5:
+            plt.plot(t, y_plot[2, :],'rx',label='measurements')
+            plt.plot(t, x_dyn[i, :], 'b', label='Simulated Data')
+            plt.plot(t, x_ekf[i, :], 'g', label='EKF Estimate')
+        else:
             plt.plot(t, x_dyn[i, :], 'b', label='Simulated Data')
             plt.plot(t, x_ekf[i, :], 'g', label='EKF Estimate')
         plt.legend(loc='upper right')
@@ -119,12 +137,25 @@ def main():
     for i in range(0,6):
         
         if i==2:
-            plt.plot(t, np.sin(y_plot[i, :]),'rx',label='measurements')
             plt.plot(t, np.sin(x_dyn[i, :]), 'b', label='Simulated Data')
             plt.plot(t, np.sin(x_ekf[i, :]), 'g', label='EKF Estimate')
             plt.plot(t, np.sin(x_ekf_prd[i, :]), 'r', label='EKF Estimate w/ lrn. func')
-        else:
+        elif i == 0:
             plt.plot(t, y_plot[i, :],'rx',label='measurements')
+            plt.plot(t, x_dyn[i, :], 'b', label='Simulated Data')
+            plt.plot(t, x_ekf[i, :], 'g', label='EKF Estimate')
+            plt.plot(t, x_ekf_prd[i, :], 'r', label='EKF Estimate w/ lrn. func')
+        elif i == 1:
+            plt.plot(t, y_plot[i, :],'rx',label='measurements')
+            plt.plot(t, x_dyn[i, :], 'b', label='Simulated Data')
+            plt.plot(t, x_ekf[i, :], 'g', label='EKF Estimate')
+            plt.plot(t, x_ekf_prd[i, :], 'r', label='EKF Estimate w/ lrn. func')
+        elif i == 5:
+            plt.plot(t, y_plot[2, :],'rx',label='measurements')
+            plt.plot(t, x_dyn[i, :], 'b', label='Simulated Data')
+            plt.plot(t, x_ekf[i, :], 'g', label='EKF Estimate')
+            plt.plot(t, x_ekf_prd[i, :], 'r', label='EKF Estimate w/ lrn. func')
+        else:
             plt.plot(t, x_dyn[i, :], 'b', label='Simulated Data')
             plt.plot(t, x_ekf[i, :], 'g', label='EKF Estimate')
             plt.plot(t, x_ekf_prd[i, :], 'r', label='EKF Estimate w/ lrn. func')

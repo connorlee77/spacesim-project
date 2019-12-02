@@ -22,7 +22,7 @@ model = getModel()
 a = 0
 b = 0
 c = 0
-def SS3dofDyn(x,u,param, fric_func=False, dt=1):
+def SS3dofDyn(x,u,param, fric_func, dt=1):
     m = param[0]
     I = param[1]
     l = param[2]
@@ -63,8 +63,8 @@ def SS3dofDyn(x,u,param, fric_func=False, dt=1):
     known_fricfunc[1] *= 0.1
     known_fricfunc[2] *= 0.1
 
-    print("actual: ", known_fricfunc)
-    print("predicted: ", predicted.reshape((1,3))/dt)
+    #print("actual: ", known_fricfunc)
+    #print("predicted: ", predicted.reshape((1,3))/dt)
 
     if fric_func=='predict':
         dxdt += modeledfunction
