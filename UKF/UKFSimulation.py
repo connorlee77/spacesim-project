@@ -23,11 +23,8 @@ def main():
     xinit_dyn = np.array([[1],[0],[0],[0],[0],[0]])
     x0_dyn = np.reshape(xinit_dyn,(6))
     # control input
-<<<<<<< HEAD
     u = np.array([[1],[0],[1],[0],[0],[0],[0],[0]])
-=======
-    u = np.array([[1],[0],[0],[0],[0],[0],[0],[0]])
->>>>>>> 08705f9e00777eb4ef941cdf5922c4b47eeb5c98
+    #u = np.array([[1],[0],[0],[0],[0],[0],[0],[0]])
 
     Sigma = np.zeros((6,6))
     Sigma[0,0] = 0.005
@@ -45,11 +42,7 @@ def main():
     #Intial Conditions for UKF
 
     # state
-<<<<<<< HEAD
-    xinit_ukf = np.array([[-3],[-3],[-1.3],[0.1],[0.1],[1]])
-=======
     xinit_ukf = np.array([[-3],[-3],[0.3],[0],[0],[0]])
->>>>>>> 08705f9e00777eb4ef941cdf5922c4b47eeb5c98
     #xinit_ukf = np.array([[1],[0],[0],[0],[0],[0]])
     x0_ukf = np.reshape(xinit_ukf,(6))
     
@@ -74,11 +67,7 @@ def main():
 
     R = sig
 
-<<<<<<< HEAD
-    t = np.linspace(0, 10, 100)
-=======
     t = np.linspace(0, 20, 200)
->>>>>>> 08705f9e00777eb4ef941cdf5922c4b47eeb5c98
 
     dt = t[1]-t[0]
 
@@ -94,11 +83,7 @@ def main():
     y=[]
     # Simulated data
     for i in range(0,n-1):
-<<<<<<< HEAD
-        dx = dyn.SS3dofDyn(x_dyn[:,i],u,param, predict_fricfunc=True)
-=======
         dx = dyn.SS3dofDyn(x_dyn[:,i],u,param, predict_fricfunc=False)
->>>>>>> 08705f9e00777eb4ef941cdf5922c4b47eeb5c98
         x_dyn[:,i+1] = dyn.EulerInt(dx,dt,x_dyn[:,i])
         yg = sensor.GPS(x_dyn[:,i+1])
         ya = sensor.IMU_3DOF(x_dyn[:,i],x_dyn[:,i+1],dt)
@@ -134,7 +119,6 @@ def main():
         xs[:,idx+1] = kf.x      
         
         
-<<<<<<< HEAD
     xerror = np.linalg.norm(xs[0:2,:]-x_dyn[0:2,:],axis=0)
     xdoterror = np.linalg.norm(xs[3:5,:]-x_dyn[3:5,:],axis=0)
     print(np.mean(xerror))
@@ -195,10 +179,6 @@ def main():
     plt.xlabel('t')
     plt.ylabel(r'$\dot{\theta}$')
     plt.grid()
-=======
-    plt.plot(x_dyn[4, 2:])
-    plt.plot(xs[4, 2:])
->>>>>>> 08705f9e00777eb4ef941cdf5922c4b47eeb5c98
     plt.show()
 
 
