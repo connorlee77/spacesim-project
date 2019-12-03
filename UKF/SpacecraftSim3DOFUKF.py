@@ -7,7 +7,7 @@ import sympy as sp
 
 import matplotlib.pyplot as plt
 import SensorModel as sensor
-import SpacecraftSim3DOF as dyn
+import SpacecraftSim3DOF_new as dyn
 
 """
 Discrete EKF Implementation of the Spacecraft Simulator 
@@ -34,7 +34,28 @@ def SensorMatrix(x):
 
 # Propagation Step
 
-def state_prop(x,dt,u,param):
+#def state_prop(x,dt,u,param):
+#    # Process Noise 
+#    """
+#    Sigma = np.zeros((6,6))
+#    Sigma[0,0] = 0.005
+#    Sigma[1,1] = 0.005
+#    Sigma[2,2] = 0.005
+#    Sigma[3,3] = 0.005
+#    Sigma[4,4] = 0.005
+#    Sigma[5,5] = 0.005
+#    """#
+#
+#    # Propagation Example Discrete Dynamics
+#
+#    xp_dummy = dyn.SS3dofDyn(x,u,param, predict_fricfunc=False)
+#    xp_dummy = dyn.SS3dofDyn(x,u,param, predict_fricfunc=True)
+#    xp = dyn.EulerInt(xp_dummy,dt,x) 
+#    # + Sigma*np.random.randn(6,1)
+#    
+#    return xp
+
+def state_prop(x,dt,u,param, fric_func):
     # Process Noise 
     """
     Sigma = np.zeros((6,6))
@@ -47,9 +68,8 @@ def state_prop(x,dt,u,param):
     """
 
     # Propagation Example Discrete Dynamics
-
-    xp_dummy = dyn.SS3dofDyn(x,u,param, predict_fricfunc=False)
-    xp_dummy = dyn.SS3dofDyn(x,u,param, predict_fricfunc=True)
+    
+    xp_dummy = dyn.SS3dofDyn(x,u,param, fric_func=fric_func, dt=dt)
     xp = dyn.EulerInt(xp_dummy,dt,x) 
     # + Sigma*np.random.randn(6,1)
 

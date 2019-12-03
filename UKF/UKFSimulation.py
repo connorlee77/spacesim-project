@@ -9,7 +9,7 @@ from filterpy.kalman import UnscentedKalmanFilter
 
 import matplotlib.pyplot as plt
 import SensorModel as sensor
-import SpacecraftSim3DOF as dyn
+import SpacecraftSim3DOF_new as dyn
 import SpacecraftSim3DOFUKF as ukf
 
 """
@@ -54,7 +54,7 @@ def main():
 
     # Process Covariance 
 
-    Q = np.identity(6)*0.1
+    Q = np.identity(6)*1
     #Q = np.array([[0.01,0,0,0,0,0],[0,0.01,0,0,0,0],[0,0,0.1,0,0,0],[0,0,0,1,0,0],[0,0,0,0,1,0],[0,0,0,0,0,1]])
     
 
@@ -87,7 +87,7 @@ def main():
     print(y)
     # Simulated data
     for i in range(0,n-1):
-        dx = dyn.SS3dofDyn(x_dyn[:,i],u,param, predict_fricfunc=False)
+        dx = dyn.SS3dofDyn(x_dyn[:,i],u,param, fric_func='true', dt=dt)
         x_dyn[:,i+1] = dyn.EulerInt(dx,dt,x_dyn[:,i])
         yg = sensor.GPS(x_dyn[:,i+1])
         ya = sensor.IMU_3DOF(x_dyn[:,i],x_dyn[:,i+1],dt)
@@ -130,7 +130,7 @@ def main():
     
     for idx, z in enumerate(zs):
         z=z.reshape((6))
-        kf.predict(u=u,param=param)
+        kf.predict(u=u,param=param,fric_func='predict')
         kf.update(z)
         xs[:,idx+1] = kf.x
         y_plot[:,idx] = z[:]
